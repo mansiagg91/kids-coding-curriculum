@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱 Pet Care Adventure - Ages 7-9</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ffeeee 0%, #ffe4e4 100%);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 107, 107, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #ff6b6b;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .pet-area {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            width: 100%;
+            max-width: 500px;
+            height: 400px;
+            border: 3px solid #ff6b6b;
+            border-radius: 15px;
+            background: #87ceeb;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .controls {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls h3 {
+            color: #ff6b6b;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .block-button {
+            width: 100%;
+            padding: 15px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Comic Sans MS', cursive;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .feed-btn { background: linear-gradient(45deg, #4CAF50, #45a049); }
+        .play-btn { background: linear-gradient(45deg, #2196F3, #1976d2); }
+        .sleep-btn { background: linear-gradient(45deg, #9C27B0, #7b1fa2); }
+        .teach-btn { background: linear-gradient(45deg, #FF9800, #f57c00); }
+        .combo-btn { background: linear-gradient(45deg, #ff6b6b, #e53e3e); }
+
+        .block-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .block-button:active {
+            transform: translateY(0);
+        }
+
+        .status-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+        }
+
+        .stat-bar {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            width: 80px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-progress {
+            flex: 1;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+
+        .stat-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .happiness-fill { background: linear-gradient(45deg, #ff69b4, #ff1493); }
+        .hunger-fill { background: linear-gradient(45deg, #4CAF50, #45a049); }
+        .energy-fill { background: linear-gradient(45deg, #2196F3, #1976d2); }
+
+        .message-area {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            min-height: 100px;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .sequence-area {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(200, 200, 255, 0.3);
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 5px;
+            border-left: 3px solid #ff6b6b;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+            .controls {
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🐱 Pet Care Adventure!</h1>
+        <p>Learn Programming with Visual Blocks and Fluffy the Cat</p>
+    </div>
+
+    <div class="game-container">
+        <div class="pet-area">
+            <canvas id="petCanvas" width="500" height="400"></canvas>
+            
+            <div class="status-area">
+                <div class="stat-bar">
+                    <span class="stat-label">😊 Happy:</span>
+                    <div class="stat-progress">
+                        <div class="stat-fill happiness-fill" id="happinessBar" style="width: 70%"></div>
+                    </div>
+                    <span id="happinessValue">3/5</span>
+                </div>
+                
+                <div class="stat-bar">
+                    <span class="stat-label">🍽️ Hunger:</span>
+                    <div class="stat-progress">
+                        <div class="stat-fill hunger-fill" id="hungerBar" style="width: 40%"></div>
+                    </div>
+                    <span id="hungerValue">2/5</span>
+                </div>
+                
+                <div class="stat-bar">
+                    <span class="stat-label">⚡ Energy:</span>
+                    <div class="stat-progress">
+                        <div class="stat-fill energy-fill" id="energyBar" style="width: 80%"></div>
+                    </div>
+                    <span id="energyValue">4/5</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <h3>🧩 Programming Blocks</h3>
+            
+            <button class="block-button feed-btn" onclick="useBlock('feed')">
+                🍎 FEED FLUFFY
+            </button>
+            
+            <button class="block-button play-btn" onclick="useBlock('play')">
+                🎾 PLAY TOGETHER
+            </button>
+            
+            <button class="block-button sleep-btn" onclick="useBlock('sleep')">
+                🛏️ NAP TIME
+            </button>
+            
+            <button class="block-button teach-btn" onclick="useBlock('teach')">
+                🎓 TEACH TRICK
+            </button>
+            
+            <h4 style="color: #ff6b6b; margin: 20px 0 10px 0;">🌟 Special Combo:</h4>
+            
+            <button class="block-button combo-btn" onclick="useBlock('happy_combo')">
+                🎉 HAPPY COMBO<br><small>(Feed + Play)</small>
+            </button>
+
+            <div class="sequence-area">
+                <h4 style="color: #333; margin-bottom: 10px;">📋 Block Sequence:</h4>
+                <div id="sequenceList">Click blocks to start programming!</div>
+            </div>
+
+            <div class="message-area">
+                <h4 style="color: #ff6b6b; margin-bottom: 10px;">💬 Fluffy Says:</h4>
+                <div id="messageArea">
+                    <div class="message">🐱 Hi! I'm Fluffy! Click the colorful blocks to take care of me and learn programming!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pet Care Adventure Game - JavaScript Version
+        class PetGame {
+            constructor() {
+                this.canvas = document.getElementById('petCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                
+                // Pet state
+                this.pet = {
+                    name: 'Fluffy',
+                    happiness: 3,  // 1-5 scale
+                    hunger: 2,     // 1-5 scale  
+                    energy: 4,     // 1-5 scale
+                    x: 250,
+                    y: 200,
+                    tricks: []
+                };
+                
+                this.blocksUsed = [];
+                this.messages = ['🐱 Hi! I\'m Fluffy! Click the colorful blocks to take care of me and learn programming!'];
+                
+                this.init();
+            }
+            
+            init() {
+                this.drawPet();
+                this.updateUI();
+                
+                // Animate pet breathing
+                setInterval(() => {
+                    this.drawPet();
+                }, 2000);
+            }
+            
+            drawPet() {
+                // Clear canvas
+                this.ctx.fillStyle = '#87ceeb';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw background elements
+                this.drawBackground();
+                
+                // Pet body (circle)
+                const petSize = 40 + Math.sin(Date.now() / 1000) * 2; // Breathing animation
+                this.ctx.fillStyle = '#ffb6c1';
+                this.ctx.beginPath();
+                this.ctx.arc(this.pet.x, this.pet.y, petSize, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                // Pet outline
+                this.ctx.strokeStyle = '#ff69b4';
+                this.ctx.lineWidth = 3;
+                this.ctx.stroke();
+                
+                // Eyes
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.beginPath();
+                this.ctx.arc(this.pet.x - 15, this.pet.y - 10, 8, 0, Math.PI * 2);
+                this.ctx.arc(this.pet.x + 15, this.pet.y - 10, 8, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.fillStyle = '#000000';
+                this.ctx.beginPath();
+                this.ctx.arc(this.pet.x - 15, this.pet.y - 10, 4, 0, Math.PI * 2);
+                this.ctx.arc(this.pet.x + 15, this.pet.y - 10, 4, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                // Mouth based on happiness
+                this.ctx.strokeStyle = '#000000';
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+                
+                if (this.pet.happiness >= 4) {
+                    // Very happy - big smile
+                    this.ctx.arc(this.pet.x, this.pet.y + 5, 15, 0, Math.PI);
+                    // Add sparkles
+                    this.drawSparkles();
+                } else if (this.pet.happiness >= 2) {
+                    // Happy - normal smile
+                    this.ctx.arc(this.pet.x, this.pet.y + 5, 10, 0, Math.PI);
+                } else {
+                    // Sad - frown
+                    this.ctx.arc(this.pet.x, this.pet.y + 15, 10, Math.PI, 0);
+                }
+                this.ctx.stroke();
+                
+                // Pet name
+                this.ctx.fillStyle = '#333';
+                this.ctx.font = 'bold 18px Comic Sans MS';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText(`🐱 ${this.pet.name}`, this.pet.x, this.pet.y + 70);
+                
+                // Status indicators
+                if (this.pet.hunger <= 2) {
+                    this.ctx.font = '20px Arial';
+                    this.ctx.fillText('🍽️', this.pet.x + 50, this.pet.y - 30);
+                }
+                if (this.pet.energy <= 2) {
+                    this.ctx.font = '20px Arial';
+                    this.ctx.fillText('😴', this.pet.x - 50, this.pet.y - 30);
+                }
+                if (this.pet.happiness >= 4) {
+                    this.ctx.font = '20px Arial';
+                    this.ctx.fillText('✨', this.pet.x, this.pet.y - 60);
+                }
+            }
+            
+            drawBackground() {
+                // Simple background elements
+                // Sun
+                this.ctx.fillStyle = '#ffeb3b';
+                this.ctx.beginPath();
+                this.ctx.arc(50, 50, 20, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                // Clouds
+                this.drawCloud(150, 60);
+                this.drawCloud(350, 80);
+                
+                // Grass
+                this.ctx.fillStyle = '#81c784';
+                this.ctx.fillRect(0, 350, this.canvas.width, 50);
+            }
+            
+            drawCloud(x, y) {
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, 15, 0, Math.PI * 2);
+                this.ctx.arc(x + 20, y, 20, 0, Math.PI * 2);
+                this.ctx.arc(x + 40, y, 15, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+            
+            drawSparkles() {
+                const sparkles = [
+                    {x: this.pet.x - 60, y: this.pet.y - 40},
+                    {x: this.pet.x + 60, y: this.pet.y - 30},
+                    {x: this.pet.x - 40, y: this.pet.y + 50},
+                    {x: this.pet.x + 40, y: this.pet.y + 60}
+                ];
+                
+                this.ctx.fillStyle = '#ffeb3b';
+                this.ctx.font = '16px Arial';
+                sparkles.forEach(sparkle => {
+                    this.ctx.fillText('✨', sparkle.x, sparkle.y);
+                });
+            }
+            
+            useBlock(action) {
+                this.blocksUsed.push(action);
+                let message = '';
+                let success = true;
+                
+                switch(action) {
+                    case 'feed':
+                        if (this.pet.hunger < 5) {
+                            this.pet.hunger = Math.min(5, this.pet.hunger + 2);
+                            this.pet.happiness = Math.min(5, this.pet.happiness + 1);
+                            message = '🍎 Yummy! Fluffy loves the food!';
+                            this.animatePet('bounce');
+                        } else {
+                            message = '🍎 Fluffy is too full right now!';
+                            success = false;
+                        }
+                        break;
+                        
+                    case 'play':
+                        if (this.pet.energy > 1) {
+                            this.pet.energy = Math.max(1, this.pet.energy - 1);
+                            this.pet.happiness = Math.min(5, this.pet.happiness + 2);
+                            message = '🎾 Wheee! Playing is so fun!';
+                            this.animatePet('jump');
+                        } else {
+                            message = '🎾 Fluffy is too tired to play!';
+                            success = false;
+                        }
+                        break;
+                        
+                    case 'sleep':
+                        this.pet.energy = Math.min(5, this.pet.energy + 2);
+                        message = '🛏️ Zzz... Fluffy feels much better!';
+                        this.animatePet('sleep');
+                        break;
+                        
+                    case 'teach':
+                        if (this.pet.energy > 2 && this.pet.happiness > 2) {
+                            const tricks = ['sit', 'roll over', 'shake hands', 'dance', 'sing'];
+                            const availableTricks = tricks.filter(t => !this.pet.tricks.includes(t));
+                            
+                            if (availableTricks.length > 0) {
+                                const newTrick = availableTricks[Math.floor(Math.random() * availableTricks.length)];
+                                this.pet.tricks.push(newTrick);
+                                this.pet.happiness = Math.min(5, this.pet.happiness + 1);
+                                this.pet.energy = Math.max(1, this.pet.energy - 1);
+                                message = `🎓 Wow! Fluffy learned to ${newTrick}!`;
+                                this.animatePet('spin');
+                            } else {
+                                message = '🎓 Fluffy knows all the tricks!';
+                            }
+                        } else {
+                            message = '🎓 Fluffy needs more energy and happiness to learn!';
+                            success = false;
+                        }
+                        break;
+                        
+                    case 'happy_combo':
+                        this.pet.hunger = Math.min(5, this.pet.hunger + 1);
+                        if (this.pet.energy > 1) {
+                            this.pet.energy = Math.max(1, this.pet.energy - 1);
+                        }
+                        this.pet.happiness = 5; // Max happiness!
+                        message = '🎉 SUPER COMBO! Fluffy is super happy!';
+                        this.animatePet('celebration');
+                        break;
+                }
+                
+                this.addMessage(message);
+                this.updateSequence();
+                this.updateUI();
+                this.checkAchievements();
+                
+                // Redraw pet with new state
+                setTimeout(() => this.drawPet(), 100);
+            }
+            
+            animatePet(type) {
+                const originalX = this.pet.x;
+                const originalY = this.pet.y;
+                
+                switch(type) {
+                    case 'bounce':
+                        let bounceCount = 0;
+                        const bounceInterval = setInterval(() => {
+                            this.pet.y = originalY - Math.sin(bounceCount * 0.5) * 10;
+                            this.drawPet();
+                            bounceCount++;
+                            if (bounceCount > 20) {
+                                clearInterval(bounceInterval);
+                                this.pet.y = originalY;
+                                this.drawPet();
+                            }
+                        }, 50);
+                        break;
+                        
+                    case 'jump':
+                        let jumpPhase = 0;
+                        const jumpInterval = setInterval(() => {
+                            this.pet.y = originalY - Math.sin(jumpPhase) * 30;
+                            this.drawPet();
+                            jumpPhase += 0.2;
+                            if (jumpPhase > Math.PI) {
+                                clearInterval(jumpInterval);
+                                this.pet.y = originalY;
+                                this.drawPet();
+                            }
+                        }, 30);
+                        break;
+                        
+                    case 'sleep':
+                        // Gentle breathing animation
+                        break;
+                        
+                    case 'spin':
+                        let spinCount = 0;
+                        const spinInterval = setInterval(() => {
+                            // Visual spin effect could be added here
+                            spinCount++;
+                            if (spinCount > 10) {
+                                clearInterval(spinInterval);
+                            }
+                        }, 100);
+                        break;
+                        
+                    case 'celebration':
+                        // Combination of animations
+                        this.animatePet('bounce');
+                        setTimeout(() => this.animatePet('jump'), 500);
+                        break;
+                }
+            }
+            
+            addMessage(message) {
+                this.messages.unshift(message);
+                if (this.messages.length > 5) {
+                    this.messages = this.messages.slice(0, 5);
+                }
+                
+                const messageArea = document.getElementById('messageArea');
+                messageArea.innerHTML = this.messages.map(msg => 
+                    `<div class="message">${msg}</div>`
+                ).join('');
+            }
+            
+            updateSequence() {
+                const blockNames = {
+                    'feed': '🍎 FEED',
+                    'play': '🎾 PLAY',
+                    'sleep': '🛏️ SLEEP', 
+                    'teach': '🎓 TEACH',
+                    'happy_combo': '🎉 COMBO'
+                };
+                
+                const recentBlocks = this.blocksUsed.slice(-6);
+                const sequenceText = recentBlocks.map((block, index) => 
+                    `${index + 1}. ${blockNames[block] || block}`
+                ).join('<br>');
+                
+                document.getElementById('sequenceList').innerHTML = sequenceText || 'Click blocks to start programming!';
+            }
+            
+            updateUI() {
+                // Update stat bars
+                document.getElementById('happinessBar').style.width = `${(this.pet.happiness / 5) * 100}%`;
+                document.getElementById('hungerBar').style.width = `${(this.pet.hunger / 5) * 100}%`;
+                document.getElementById('energyBar').style.width = `${(this.pet.energy / 5) * 100}%`;
+                
+                // Update stat values
+                document.getElementById('happinessValue').textContent = `${this.pet.happiness}/5`;
+                document.getElementById('hungerValue').textContent = `${this.pet.hunger}/5`;
+                document.getElementById('energyValue').textContent = `${this.pet.energy}/5`;
+            }
+            
+            checkAchievements() {
+                if (this.blocksUsed.length === 1) {
+                    this.addMessage('🎉 First Block Award! You used your first programming block!');
+                } else if (this.blocksUsed.length === 5) {
+                    this.addMessage('🌟 Block Master! You\'ve used 5 programming blocks!');
+                } else if (this.pet.happiness === 5) {
+                    this.addMessage('💖 Perfect Pet Parent! Fluffy is super happy!');
+                }
+                
+                if (this.pet.tricks.length >= 3) {
+                    this.addMessage('🎓 Trick Master! Fluffy knows so many tricks!');
+                }
+            }
+        }
+        
+        // Global function for button clicks
+        let game;
+        
+        function useBlock(action) {
+            game.useBlock(action);
+        }
+        
+        // Start the game when page loads
+        window.addEventListener('load', () => {
+            game = new PetGame();
+            console.log('🐱 Pet Care Adventure started!');
+        });
+    </script>
+</body>
+</html>

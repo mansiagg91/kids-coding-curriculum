@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Kids Coding Games Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .games-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-card h2 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .age-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .game-description {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .features li {
+            padding: 5px 0;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .features li:before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+            top: 5px;
+        }
+
+        .play-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .play-button:hover {
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+            transform: scale(1.05);
+        }
+
+        .soon-button {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            cursor: not-allowed;
+        }
+
+        .soon-button:hover {
+            transform: none;
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            margin-top: 50px;
+        }
+
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .tech-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎮 Kids Coding Games Portal</h1>
+        <p>Learn Programming and AI Through Interactive Games</p>
+    </div>
+
+    <div class="games-container">
+        <!-- Ages 7-9 Game -->
+        <div class="game-card">
+            <h2>🐱 Pet Care Adventure</h2>
+            <div class="age-badge">Ages 7-9</div>
+            <div class="game-description">
+                Start your coding journey by caring for adorable virtual pets! Learn programming concepts through colorful visual blocks and immediate feedback.
+            </div>
+            <ul class="features">
+                <li>Visual programming blocks</li>
+                <li>Cute pet animations</li>
+                <li>Simple drag-and-drop interface</li>
+                <li>Achievement system</li>
+                <li>No typing required!</li>
+            </ul>
+            <a href="pet-care-adventure.html" class="play-button">🎮 Play Now!</a>
+        </div>
+
+        <!-- Ages 10-12 Game -->
+        <div class="game-card">
+            <h2>🐍 Python Pet AI</h2>
+            <div class="age-badge">Ages 10-12</div>
+            <div class="game-description">
+                Watch AI pets think and interact! Learn Python programming and artificial intelligence through autonomous pet behaviors.
+            </div>
+            <ul class="features">
+                <li>Real AI decision-making</li>
+                <li>Python code visualization</li>
+                <li>Interactive pet ecosystem</li>
+                <li>Neural network basics</li>
+                <li>Live code examples</li>
+            </ul>
+            <a href="python-pet-ai.html" class="play-button">🎮 Play Now!</a>
+        </div>
+
+        <!-- Ages 13-15 Game -->
+        <div class="game-card">
+            <h2>🌐 Web Pet Ecosystem</h2>
+            <div class="age-badge">Ages 13-15</div>
+            <div class="game-description">
+                Advanced web-based pet simulation with neural networks! Build and train AI pets using modern web technologies.
+            </div>
+            <ul class="features">
+                <li>JavaScript neural networks</li>
+                <li>Real-time ecosystem simulation</li>
+                <li>Advanced AI behaviors</li>
+                <li>Professional web development</li>
+                <li>Machine learning concepts</li>
+            </ul>
+            <a href="../ages-13-15-web-development/games/web_pet_ecosystem.html" class="play-button">🎮 Play Now!</a>
+        </div>
+
+        <!-- Ages 16-18 Game -->
+        <div class="game-card">
+            <h2>🚀 Multiplayer AI Arena</h2>
+            <div class="age-badge">Ages 16-18</div>
+            <div class="game-description">
+                Professional-grade multiplayer platform where AI agents compete! Learn enterprise development and advanced machine learning.
+            </div>
+            <ul class="features">
+                <li>Real-time multiplayer</li>
+                <li>Advanced neural networks</li>
+                <li>WebSocket communication</li>
+                <li>Enterprise architecture</li>
+                <li>Professional AI development</li>
+            </ul>
+            <button class="play-button soon-button">🔧 Coming Soon</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <h3>🛠️ Built with Modern Web Technologies</h3>
+        <div class="tech-stack">
+            <span class="tech-badge">HTML5 Canvas</span>
+            <span class="tech-badge">JavaScript ES6+</span>
+            <span class="tech-badge">CSS3 Animations</span>
+            <span class="tech-badge">Neural Networks</span>
+            <span class="tech-badge">AI/ML Concepts</span>
+            <span class="tech-badge">Game Development</span>
+        </div>
+        <p style="margin-top: 20px; opacity: 0.8;">
+            🎓 Part of the Kids Coding Curriculum - Teaching Programming Through Play
+        </p>
+    </div>
+</body>
+</html>

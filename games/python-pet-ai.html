@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Python Pet AI - Ages 10-12</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .game-area {
+            flex: 1;
+            position: relative;
+            margin: 10px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #87ceeb 0%, #98fb98 100%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-panel {
+            width: 350px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 10px;
+            overflow-y: auto;
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-section h3 {
+            margin: 0 0 15px 0;
+            color: #64b5f6;
+            font-size: 1.2em;
+        }
+
+        .control-button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .spawn-food { background: linear-gradient(45deg, #ff9800, #f57c00); }
+        .toggle-code { background: linear-gradient(45deg, #9c27b0, #7b1fa2); }
+        .reset-game { background: linear-gradient(45deg, #f44336, #d32f2f); }
+
+        .pet-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .pet-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .pet-card h4 {
+            margin: 0 0 8px 0;
+            font-size: 1em;
+        }
+
+        .stat-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 3px 0;
+        }
+
+        .stat-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 3px;
+        }
+
+        .hunger-fill { background: #ff6b6b; }
+        .energy-fill { background: #4ecdc4; }
+        .happiness-fill { background: #ffe66d; }
+
+        .ai-code {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+
+        .message-log {
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .message {
+            margin: 3px 0;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            border-left: 3px solid #64b5f6;
+        }
+
+        .ecosystem-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+
+        .python-highlight {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .ai-highlight {
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        @media (max-width: 1024px) {
+            .game-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .control-panel {
+                width: auto;
+                margin: 10px;
+            }
+            .pet-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🐍 Python Pet AI Simulation</h1>
+        <p>Watch AI Pets Think and Act Autonomously Using Python Logic</p>
+    </div>
+
+    <div class="game-container">
+        <div class="game-area">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+        </div>
+
+        <div class="control-panel">
+            <div class="control-section">
+                <h3>🎮 Game Controls</h3>
+                <button class="control-button spawn-food" onclick="spawnFood()">
+                    🍎 Spawn Food (Space)
+                </button>
+                <button class="control-button toggle-code" onclick="toggleCodeDisplay()">
+                    🤖 Toggle Python Code (C)
+                </button>
+                <button class="control-button reset-game" onclick="resetGame()">
+                    🔄 Reset Simulation (R)
+                </button>
+            </div>
+
+            <div class="control-section">
+                <h3>📊 Ecosystem Status</h3>
+                <div class="ecosystem-info">
+                    <div class="info-item">
+                        <span>🐾 AI Pets:</span>
+                        <span id="petCount">3</span>
+                    </div>
+                    <div class="info-item">
+                        <span>🍎 Food Items:</span>
+                        <span id="foodCount">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span>⚡ <span class="ai-highlight">AI Updates</span>:</span>
+                        <span id="aiUpdates">60/sec</span>
+                    </div>
+                    <div class="info-item">
+                        <span>🧠 <span class="python-highlight">Python</span>:</span>
+                        <span>Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>🐱 Pet AI Statistics</h3>
+                <div id="petStatsContainer"></div>
+            </div>
+
+            <div class="control-section" id="codeSection" style="display: none;">
+                <h3>🐍 <span class="python-highlight">Python AI Code</span></h3>
+                <div class="ai-code" id="codeDisplay">
+# Python Pet AI Decision Making
+class PetAI:
+    def __init__(self, personality):
+        self.personality = personality
+        self.current_goal = None
+    
+    def think(self, my_state, environment):
+        if my_state.hunger > 70:
+            self.current_goal = 'find_food'
+        elif my_state.energy < 30:
+            self.current_goal = 'rest'
+        else:
+            self.current_goal = 'explore'
+        
+        return self.execute_action()
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>📜 Activity Log</h3>
+                <div class="message-log" id="messageLog"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Python Pet AI - JavaScript Implementation
+        class PetAI {
+            constructor(name, personality) {
+                this.name = name;
+                this.personality = personality;
+                this.currentGoal = 'explore';
+                this.lastThinkTime = 0;
+                this.decisionHistory = [];
+            }
+
+            think(pet, environment) {
+                const now = Date.now();
+                if (now - this.lastThinkTime < 500) return this.currentGoal; // Think every 500ms
+                this.lastThinkTime = now;
+
+                // Calculate needs urgency
+                const hungerUrgency = Math.max(0, pet.hunger - 30) / 70.0;
+                const energyUrgency = Math.max(0, 100 - pet.energy) / 70.0;
+                const socialUrgency = Math.max(0, 50 - pet.happiness) / 50.0;
+
+                // Weight by personality
+                const weightedNeeds = {
+                    hunger: hungerUrgency * (this.personality.food || 0.5),
+                    energy: energyUrgency * (this.personality.energy || 0.5),
+                    social: socialUrgency * (this.personality.social || 0.5)
+                };
+
+                // Decision logic
+                if (weightedNeeds.hunger > 0.7) {
+                    this.currentGoal = 'find_food';
+                } else if (weightedNeeds.energy > 0.8) {
+                    this.currentGoal = 'rest';
+                } else if (weightedNeeds.social > 0.4) {
+                    this.currentGoal = 'socialize';
+                } else {
+                    this.currentGoal = 'explore';
+                }
+
+                this.decisionHistory.push({
+                    time: now,
+                    goal: this.currentGoal,
+                    needs: weightedNeeds
+                });
+
+                // Generate code display
+                if (Math.random() < 0.1) {
+                    this.updateCodeDisplay(weightedNeeds);
+                }
+
+                return this.currentGoal;
+            }
+
+            updateCodeDisplay(needs) {
+                const codeTemplate = `# ${this.name}'s AI Decision Process
+pet_state = {
+    'hunger': ${(needs.hunger * 100).toFixed(1)},
+    'energy': ${(100 - needs.energy * 70).toFixed(1)},
+    'happiness': ${(100 - needs.social * 50).toFixed(1)}
+}
+
+# Personality weights: ${JSON.stringify(this.personality, null, 2)}
+
+# Decision logic:
+if pet_state['hunger'] > 70:
+    goal = 'find_food'
+    print("${this.name}: I'm hungry! Looking for food...")
+elif pet_state['energy'] < 30:
+    goal = 'rest'  
+    print("${this.name}: I need to rest...")
+elif pet_state['happiness'] < 50:
+    goal = 'socialize'
+    print("${this.name}: Time to make friends!")
+else:
+    goal = 'explore'
+    print("${this.name}: Let's explore!")
+
+# Current decision: '${this.currentGoal}'`;
+
+                document.getElementById('codeDisplay').textContent = codeTemplate;
+            }
+
+            executeAction(pet, goal, environment) {
+                switch(goal) {
+                    case 'find_food':
+                        return this.findFoodBehavior(pet, environment);
+                    case 'rest':
+                        return this.restBehavior(pet);
+                    case 'socialize':
+                        return this.socializeBehavior(pet, environment);
+                    case 'explore':
+                    default:
+                        return this.exploreBehavior(pet);
+                }
+            }
+
+            findFoodBehavior(pet, environment) {
+                if (environment.food.length === 0) {
+                    return { dx: 0, dy: 0 };
+                }
+
+                // Find closest food
+                let closestFood = null;
+                let minDistance = Infinity;
+
+                environment.food.forEach(food => {
+                    const distance = Math.sqrt((pet.x - food.x) ** 2 + (pet.y - food.y) ** 2);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestFood = food;
+                    }
+                });
+
+                if (closestFood) {
+                    const dx = closestFood.x - pet.x;
+                    const dy = closestFood.y - pet.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance > 5) {
+                        const speed = 2;
+                        return {
+                            dx: (dx / distance) * speed,
+                            dy: (dy / distance) * speed
+                        };
+                    }
+                }
+
+                return { dx: 0, dy: 0 };
+            }
+
+            restBehavior(pet) {
+                // Move to corners for rest
+                const corners = [
+                    { x: 60, y: 60 },
+                    { x: 740, y: 60 },
+                    { x: 60, y: 540 },
+                    { x: 740, y: 540 }
+                ];
+
+                const closestCorner = corners.reduce((closest, corner) => {
+                    const dist1 = Math.sqrt((pet.x - corner.x) ** 2 + (pet.y - corner.y) ** 2);
+                    const dist2 = Math.sqrt((pet.x - closest.x) ** 2 + (pet.y - closest.y) ** 2);
+                    return dist1 < dist2 ? corner : closest;
+                });
+
+                const dx = closestCorner.x - pet.x;
+                const dy = closestCorner.y - pet.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance > 15) {
+                    return {
+                        dx: (dx / distance) * 1,
+                        dy: (dy / distance) * 1
+                    };
+                }
+
+                return { dx: 0, dy: 0 };
+            }
+
+            socializeBehavior(pet, environment) {
+                const otherPets = environment.pets.filter(p => p.name !== pet.name);
+                
+                if (otherPets.length === 0) {
+                    return this.exploreBehavior(pet);
+                }
+
+                // Find closest happy pet
+                let target = null;
+                let minDistance = Infinity;
+
+                otherPets.forEach(otherPet => {
+                    if (otherPet.happiness > 50) {
+                        const distance = Math.sqrt((pet.x - otherPet.x) ** 2 + (pet.y - otherPet.y) ** 2);
+                        if (distance < minDistance && distance > 25) { // Don't get too close
+                            minDistance = distance;
+                            target = otherPet;
+                        }
+                    }
+                });
+
+                if (target) {
+                    const dx = target.x - pet.x;
+                    const dy = target.y - pet.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance > 40) {
+                        return {
+                            dx: (dx / distance) * 1.5,
+                            dy: (dy / distance) * 1.5
+                        };
+                    }
+                }
+
+                return { dx: 0, dy: 0 };
+            }
+
+            exploreBehavior(pet) {
+                // Random exploration
+                return {
+                    dx: (Math.random() - 0.5) * 3,
+                    dy: (Math.random() - 0.5) * 3
+                };
+            }
+        }
+
+        class PetSimulation {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                
+                this.pets = [
+                    {
+                        name: 'Buddy',
+                        x: 200, y: 200,
+                        hunger: 40, energy: 80, happiness: 70,
+                        color: '#ff6b6b',
+                        ai: new PetAI('Buddy', { food: 0.8, energy: 0.6, social: 0.7 })
+                    },
+                    {
+                        name: 'Luna',
+                        x: 400, y: 300,
+                        hunger: 60, energy: 50, happiness: 40,
+                        color: '#4ecdc4',
+                        ai: new PetAI('Luna', { food: 0.7, energy: 0.9, social: 0.3 })
+                    },
+                    {
+                        name: 'Dash',
+                        x: 600, y: 150,
+                        hunger: 30, energy: 90, happiness: 80,
+                        color: '#ffe66d',
+                        ai: new PetAI('Dash', { food: 0.5, energy: 0.4, social: 0.9 })
+                    }
+                ];
+
+                this.food = [];
+                this.messages = [];
+                this.showCode = false;
+                this.frameCount = 0;
+
+                this.init();
+            }
+
+            init() {
+                this.gameLoop();
+                this.updateUI();
+                
+                // Add initial message
+                this.addMessage('🐍 Python Pet AI simulation started!');
+                this.addMessage('🤖 Watch pets make autonomous decisions');
+                
+                // Keyboard controls
+                document.addEventListener('keydown', (e) => {
+                    switch(e.key.toLowerCase()) {
+                        case ' ':
+                            this.spawnFood();
+                            break;
+                        case 'c':
+                            this.toggleCodeDisplay();
+                            break;
+                        case 'r':
+                            this.resetGame();
+                            break;
+                    }
+                });
+            }
+
+            gameLoop() {
+                this.update();
+                this.render();
+                requestAnimationFrame(() => this.gameLoop());
+            }
+
+            update() {
+                this.frameCount++;
+                
+                const environment = {
+                    pets: this.pets,
+                    food: this.food
+                };
+
+                // Update each pet with AI
+                this.pets.forEach(pet => {
+                    const goal = pet.ai.think(pet, environment);
+                    const movement = pet.ai.executeAction(pet, goal, environment);
+
+                    // Apply movement with bounds checking
+                    pet.x = Math.max(30, Math.min(770, pet.x + movement.dx));
+                    pet.y = Math.max(30, Math.min(570, pet.y + movement.dy));
+
+                    // Update pet stats gradually
+                    pet.hunger = Math.min(100, pet.hunger + 0.03);
+                    
+                    if (goal === 'rest') {
+                        pet.energy = Math.min(100, pet.energy + 0.2);
+                    } else {
+                        pet.energy = Math.max(0, pet.energy - 0.01);
+                    }
+
+                    // Check food consumption
+                    this.food.forEach((food, index) => {
+                        const distance = Math.sqrt((pet.x - food.x) ** 2 + (pet.y - food.y) ** 2);
+                        if (distance < 25) {
+                            pet.hunger = Math.max(0, pet.hunger - 25);
+                            pet.happiness = Math.min(100, pet.happiness + 8);
+                            this.food.splice(index, 1);
+                            this.addMessage(`🍎 ${pet.name} found food!`);
+                        }
+                    });
+
+                    // Social interactions
+                    this.pets.forEach(otherPet => {
+                        if (otherPet !== pet) {
+                            const distance = Math.sqrt((pet.x - otherPet.x) ** 2 + (pet.y - otherPet.y) ** 2);
+                            if (distance < 35) {
+                                pet.happiness = Math.min(100, pet.happiness + 0.1);
+                                if (Math.random() < 0.01) {
+                                    this.addMessage(`😊 ${pet.name} and ${otherPet.name} are playing together!`);
+                                }
+                            }
+                        }
+                    });
+                });
+
+                // Auto-spawn food occasionally
+                if (Math.random() < 0.005 && this.food.length < 4) {
+                    this.spawnFood();
+                }
+
+                // Update UI periodically
+                if (this.frameCount % 60 === 0) {
+                    this.updateUI();
+                }
+            }
+
+            render() {
+                // Clear canvas with gradient
+                const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+                gradient.addColorStop(0, '#87ceeb');
+                gradient.addColorStop(1, '#98fb98');
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Draw food
+                this.food.forEach(food => {
+                    this.ctx.fillStyle = '#ffeb3b';
+                    this.ctx.beginPath();
+                    this.ctx.arc(food.x, food.y, food.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    this.ctx.strokeStyle = '#ff9800';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.stroke();
+                });
+
+                // Draw pets
+                this.pets.forEach(pet => this.drawPet(pet));
+            }
+
+            drawPet(pet) {
+                // Pet body
+                this.ctx.fillStyle = pet.color;
+                this.ctx.beginPath();
+                this.ctx.arc(pet.x, pet.y, 20, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                this.ctx.strokeStyle = '#333';
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+
+                // Eyes
+                this.ctx.fillStyle = '#fff';
+                this.ctx.beginPath();
+                this.ctx.arc(pet.x - 8, pet.y - 5, 4, 0, Math.PI * 2);
+                this.ctx.arc(pet.x + 8, pet.y - 5, 4, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                this.ctx.fillStyle = '#000';
+                this.ctx.beginPath();
+                this.ctx.arc(pet.x - 8, pet.y - 5, 2, 0, Math.PI * 2);
+                this.ctx.arc(pet.x + 8, pet.y - 5, 2, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Mouth
+                this.ctx.strokeStyle = '#000';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                if (pet.happiness > 60) {
+                    this.ctx.arc(pet.x, pet.y + 2, 6, 0, Math.PI);
+                } else if (pet.happiness < 30) {
+                    this.ctx.arc(pet.x, pet.y + 8, 6, Math.PI, 0);
+                } else {
+                    this.ctx.moveTo(pet.x - 4, pet.y + 5);
+                    this.ctx.lineTo(pet.x + 4, pet.y + 5);
+                }
+                this.ctx.stroke();
+
+                // Name
+                this.ctx.fillStyle = '#333';
+                this.ctx.font = '12px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText(pet.name, pet.x, pet.y + 35);
+
+                // Status indicators
+                if (pet.hunger > 70) {
+                    this.ctx.fillText('🍽️', pet.x + 25, pet.y - 25);
+                }
+                if (pet.energy < 30) {
+                    this.ctx.fillText('😴', pet.x - 25, pet.y - 25);
+                }
+                if (pet.happiness > 80) {
+                    this.ctx.fillText('😊', pet.x, pet.y - 30);
+                }
+
+                // AI goal indicator
+                const goal = pet.ai.currentGoal;
+                let goalIcon = '';
+                switch(goal) {
+                    case 'find_food': goalIcon = '🍎'; break;
+                    case 'rest': goalIcon = '😴'; break;
+                    case 'socialize': goalIcon = '😊'; break;
+                    case 'explore': goalIcon = '🔍'; break;
+                }
+                
+                if (goalIcon) {
+                    this.ctx.fillText(goalIcon, pet.x, pet.y - 45);
+                }
+            }
+
+            spawnFood() {
+                const food = {
+                    x: Math.random() * (this.canvas.width - 100) + 50,
+                    y: Math.random() * (this.canvas.height - 100) + 50,
+                    size: 8 + Math.random() * 4
+                };
+                this.food.push(food);
+                this.addMessage(`🍎 Food spawned at (${Math.round(food.x)}, ${Math.round(food.y)})`);
+            }
+
+            addMessage(message) {
+                this.messages.unshift(message);
+                if (this.messages.length > 8) {
+                    this.messages = this.messages.slice(0, 8);
+                }
+                
+                const messageLog = document.getElementById('messageLog');
+                messageLog.innerHTML = this.messages.map(msg => 
+                    `<div class="message">${msg}</div>`
+                ).join('');
+            }
+
+            updateUI() {
+                // Update counters
+                document.getElementById('petCount').textContent = this.pets.length;
+                document.getElementById('foodCount').textContent = this.food.length;
+
+                // Update pet stats
+                const statsContainer = document.getElementById('petStatsContainer');
+                statsContainer.innerHTML = this.pets.map(pet => `
+                    <div class="pet-card">
+                        <h4>${pet.name}</h4>
+                        <div class="stat-bar">
+                            <div class="stat-fill hunger-fill" style="width: ${pet.hunger}%"></div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill energy-fill" style="width: ${pet.energy}%"></div>
+                        </div>
+                        <div class="stat-bar">
+                            <div class="stat-fill happiness-fill" style="width: ${pet.happiness}%"></div>
+                        </div>
+                        <small>Goal: ${pet.ai.currentGoal}</small>
+                    </div>
+                `).join('');
+            }
+
+            toggleCodeDisplay() {
+                const codeSection = document.getElementById('codeSection');
+                this.showCode = !this.showCode;
+                codeSection.style.display = this.showCode ? 'block' : 'none';
+            }
+
+            resetGame() {
+                // Reset pets to initial state
+                this.pets.forEach(pet => {
+                    pet.x = 200 + Math.random() * 400;
+                    pet.y = 150 + Math.random() * 300;
+                    pet.hunger = 30 + Math.random() * 40;
+                    pet.energy = 60 + Math.random() * 40;
+                    pet.happiness = 50 + Math.random() * 30;
+                });
+                
+                this.food = [];
+                this.messages = [];
+                this.addMessage('🔄 Simulation reset!');
+                this.updateUI();
+            }
+        }
+
+        // Global functions for controls
+        let simulation;
+
+        function spawnFood() {
+            simulation.spawnFood();
+        }
+
+        function toggleCodeDisplay() {
+            simulation.toggleCodeDisplay();
+        }
+
+        function resetGame() {
+            simulation.resetGame();
+        }
+
+        // Start simulation when page loads
+        window.addEventListener('load', () => {
+            simulation = new PetSimulation();
+            console.log('🐍 Python Pet AI simulation started!');
+        });
+    </script>
+</body>
+</html>
