@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 Web Pet Ecosystem - Ages 13-15</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .ecosystem-canvas {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+        }
+
+        .control-panel {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 10px;
+            overflow-y: auto;
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-section h3 {
+            margin: 0 0 10px 0;
+            color: #64b5f6;
+        }
+
+        .pet-stats {
+            margin: 10px 0;
+        }
+
+        .stat-bar {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            width: 80px;
+            font-size: 0.9em;
+        }
+
+        .stat-progress {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+
+        .stat-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .hunger-fill { background: #ff6b6b; }
+        .energy-fill { background: #4ecdc4; }
+        .happiness-fill { background: #ffe66d; }
+
+        .ai-code {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            max-height: 150px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .control-button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .message-log {
+            max-height: 100px;
+            overflow-y: auto;
+            font-size: 0.8em;
+            line-height: 1.4;
+        }
+
+        .message {
+            margin: 2px 0;
+            padding: 2px 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .ecosystem-info {
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌐 Web Pet Ecosystem</h1>
+        <p>Advanced AI Pet Simulation with JavaScript, Canvas, and Machine Learning Concepts</p>
+    </div>
+
+    <div class="game-container">
+        <div class="ecosystem-canvas">
+            <canvas id="ecosystemCanvas" width="800" height="600"></canvas>
+        </div>
+
+        <div class="control-panel">
+            <div class="control-section">
+                <h3>🎮 Game Controls</h3>
+                <button class="control-button" onclick="spawnFood()">🍎 Spawn Food</button>
+                <button class="control-button" onclick="addNewPet()">➕ Add Pet</button>
+                <button class="control-button" onclick="toggleAIDisplay()">🤖 Toggle AI Code</button>
+                <button class="control-button" onclick="resetEcosystem()">🔄 Reset</button>
+            </div>
+
+            <div class="control-section">
+                <h3>📊 Ecosystem Stats</h3>
+                <div class="ecosystem-info">
+                    <div>🐾 Pets: <span id="petCount">3</span></div>
+                    <div>🍎 Food Items: <span id="foodCount">0</span></div>
+                    <div>⚡ AI Updates/sec: <span id="aiUpdates">60</span></div>
+                    <div>🧠 Neural Network: Active</div>
+                </div>
+            </div>
+
+            <div class="control-section" id="petStatsSection">
+                <h3>🐱 Pet Statistics</h3>
+                <div id="petStats"></div>
+            </div>
+
+            <div class="control-section" id="aiCodeSection" style="display: none;">
+                <h3>🤖 AI Decision Code</h3>
+                <div class="ai-code" id="aiCodeDisplay">
+// AI thinking...
+function makePetDecision(pet, environment) {
+    if (pet.hunger > 70) {
+        return 'findFood';
+    } else if (pet.energy < 30) {
+        return 'rest';
+    } else {
+        return 'explore';
+    }
+}
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>📜 Activity Log</h3>
+                <div class="message-log" id="messageLog"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Web Pet Ecosystem - Advanced JavaScript AI Implementation
+        class NeuralNetwork {
+            constructor(inputSize, hiddenSize, outputSize) {
+                this.weights1 = this.randomMatrix(inputSize, hiddenSize);
+                this.weights2 = this.randomMatrix(hiddenSize, outputSize);
+                this.bias1 = this.randomArray(hiddenSize);
+                this.bias2 = this.randomArray(outputSize);
+            }
+
+            randomMatrix(rows, cols) {
+                const matrix = [];
+                for (let i = 0; i < rows; i++) {
+                    matrix[i] = [];
+                    for (let j = 0; j < cols; j++) {
+                        matrix[i][j] = (Math.random() - 0.5) * 2;
+                    }
+                }
+                return matrix;
+            }
+
+            randomArray(size) {
+                return Array.from({length: size}, () => (Math.random() - 0.5) * 2);
+            }
+
+            sigmoid(x) {
+                return 1 / (1 + Math.exp(-x));
+            }
+
+            forward(inputs) {
+                // First layer
+                const hidden = [];
+                for (let i = 0; i < this.weights1[0].length; i++) {
+                    let sum = this.bias1[i];
+                    for (let j = 0; j < inputs.length; j++) {
+                        sum += inputs[j] * this.weights1[j][i];
+                    }
+                    hidden[i] = this.sigmoid(sum);
+                }
+
+                // Output layer
+                const outputs = [];
+                for (let i = 0; i < this.weights2[0].length; i++) {
+                    let sum = this.bias2[i];
+                    for (let j = 0; j < hidden.length; j++) {
+                        sum += hidden[j] * this.weights2[j][i];
+                    }
+                    outputs[i] = this.sigmoid(sum);
+                }
+
+                return outputs;
+            }
+        }
+
+        class AdvancedPetAI {
+            constructor(name, personality) {
+                this.name = name;
+                this.personality = personality;
+                this.neuralNetwork = new NeuralNetwork(8, 12, 4); // 8 inputs, 12 hidden, 4 outputs
+                this.memory = [];
+                this.currentAction = 'explore';
+                this.lastActionTime = Date.now();
+                this.learningRate = 0.01;
+            }
+
+            encodeEnvironment(pet, environment) {
+                // Normalize pet stats to 0-1 range
+                const petStats = [
+                    pet.hunger / 100,
+                    pet.energy / 100,
+                    pet.happiness / 100,
+                    pet.x / 800, // Normalized position
+                    pet.y / 600
+                ];
+
+                // Environment features
+                const envStats = [
+                    Math.min(environment.food.length / 5, 1), // Food availability
+                    Math.min(environment.pets.length / 10, 1), // Social density
+                    Math.sin(Date.now() / 10000) // Time-based cycle
+                ];
+
+                return [...petStats, ...envStats];
+            }
+
+            think(pet, environment) {
+                const inputs = this.encodeEnvironment(pet, environment);
+                const outputs = this.neuralNetwork.forward(inputs);
+
+                // Map neural network outputs to actions
+                const actions = ['findFood', 'rest', 'socialize', 'explore'];
+                const actionIndex = outputs.indexOf(Math.max(...outputs));
+                
+                // Add some personality influence
+                if (this.personality.social > 0.8 && Math.random() < 0.3) {
+                    this.currentAction = 'socialize';
+                } else if (this.personality.energy < 0.3 && pet.energy < 40) {
+                    this.currentAction = 'rest';
+                } else {
+                    this.currentAction = actions[actionIndex];
+                }
+
+                // Generate code display
+                this.generateCodeDisplay(pet, inputs, outputs);
+
+                return this.currentAction;
+            }
+
+            generateCodeDisplay(pet, inputs, outputs) {
+                const codeTemplate = `
+// ${this.name}'s Neural Network Decision
+const inputs = [${inputs.map(x => x.toFixed(2)).join(', ')}];
+const outputs = [${outputs.map(x => x.toFixed(2)).join(', ')}];
+
+// Personality: ${JSON.stringify(this.personality, null, 2)}
+
+if (outputs[0] > ${outputs[0].toFixed(2)}) {
+    action = 'findFood';
+} else if (outputs[1] > ${outputs[1].toFixed(2)}) {
+    action = 'rest';
+} else if (outputs[2] > ${outputs[2].toFixed(2)}) {
+    action = 'socialize';
+} else {
+    action = 'explore';
+}
+
+console.log('${this.name} decided to: ' + action);`;
+
+                if (Math.random() < 0.1) { // Update code display occasionally
+                    document.getElementById('aiCodeDisplay').textContent = codeTemplate;
+                }
+            }
+
+            executeAction(pet, action, environment) {
+                const now = Date.now();
+                const timeDelta = (now - this.lastActionTime) / 1000;
+                this.lastActionTime = now;
+
+                switch (action) {
+                    case 'findFood':
+                        return this.findFoodBehavior(pet, environment);
+                    
+                    case 'rest':
+                        return this.restBehavior(pet, environment);
+                    
+                    case 'socialize':
+                        return this.socializeBehavior(pet, environment);
+                    
+                    case 'explore':
+                    default:
+                        return this.exploreBehavior(pet, environment);
+                }
+            }
+
+            findFoodBehavior(pet, environment) {
+                if (environment.food.length === 0) {
+                    return this.exploreBehavior(pet, environment);
+                }
+
+                // Find closest food
+                let closestFood = null;
+                let minDistance = Infinity;
+
+                environment.food.forEach(food => {
+                    const distance = Math.sqrt((pet.x - food.x) ** 2 + (pet.y - food.y) ** 2);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestFood = food;
+                    }
+                });
+
+                if (closestFood) {
+                    const dx = closestFood.x - pet.x;
+                    const dy = closestFood.y - pet.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance > 5) {
+                        const speed = 2;
+                        return {
+                            dx: (dx / distance) * speed,
+                            dy: (dy / distance) * speed
+                        };
+                    }
+                }
+
+                return { dx: 0, dy: 0 };
+            }
+
+            restBehavior(pet, environment) {
+                // Move to a corner
+                const corners = [
+                    { x: 50, y: 50 },
+                    { x: 750, y: 50 },
+                    { x: 50, y: 550 },
+                    { x: 750, y: 550 }
+                ];
+
+                const targetCorner = corners.reduce((closest, corner) => {
+                    const dist1 = Math.sqrt((pet.x - corner.x) ** 2 + (pet.y - corner.y) ** 2);
+                    const dist2 = Math.sqrt((pet.x - closest.x) ** 2 + (pet.y - closest.y) ** 2);
+                    return dist1 < dist2 ? corner : closest;
+                });
+
+                const dx = targetCorner.x - pet.x;
+                const dy = targetCorner.y - pet.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance > 10) {
+                    return {
+                        dx: (dx / distance) * 1,
+                        dy: (dy / distance) * 1
+                    };
+                }
+
+                return { dx: 0, dy: 0 };
+            }
+
+            socializeBehavior(pet, environment) {
+                const otherPets = environment.pets.filter(p => p.name !== pet.name);
+                
+                if (otherPets.length === 0) {
+                    return this.exploreBehavior(pet, environment);
+                }
+
+                // Find closest happy pet
+                let target = null;
+                let minDistance = Infinity;
+
+                otherPets.forEach(otherPet => {
+                    if (otherPet.happiness > 50) {
+                        const distance = Math.sqrt((pet.x - otherPet.x) ** 2 + (pet.y - otherPet.y) ** 2);
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            target = otherPet;
+                        }
+                    }
+                });
+
+                if (target) {
+                    const dx = target.x - pet.x;
+                    const dy = target.y - pet.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance > 30) {
+                        return {
+                            dx: (dx / distance) * 1.5,
+                            dy: (dy / distance) * 1.5
+                        };
+                    }
+                }
+
+                return { dx: 0, dy: 0 };
+            }
+
+            exploreBehavior(pet, environment) {
+                // Random exploration with slight bias toward center
+                const centerX = 400, centerY = 300;
+                const toCenterX = centerX - pet.x;
+                const toCenterY = centerY - pet.y;
+                
+                const randomComponent = 0.7;
+                const centerBias = 0.3;
+
+                return {
+                    dx: (Math.random() - 0.5) * 4 * randomComponent + 
+                        (toCenterX / 400) * centerBias,
+                    dy: (Math.random() - 0.5) * 4 * randomComponent + 
+                        (toCenterY / 300) * centerBias
+                };
+            }
+        }
+
+        class WebPetEcosystem {
+            constructor() {
+                this.canvas = document.getElementById('ecosystemCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.canvas.width = 800;
+                this.canvas.height = 600;
+
+                this.pets = [
+                    {
+                        name: 'Neo',
+                        x: 200, y: 200,
+                        hunger: 40, energy: 80, happiness: 70,
+                        color: '#ff6b6b',
+                        ai: new AdvancedPetAI('Neo', { social: 0.8, energy: 0.6, food: 0.7 })
+                    },
+                    {
+                        name: 'Luna',
+                        x: 400, y: 300,
+                        hunger: 60, energy: 50, happiness: 40,
+                        color: '#4ecdc4',
+                        ai: new AdvancedPetAI('Luna', { social: 0.3, energy: 0.9, food: 0.8 })
+                    },
+                    {
+                        name: 'Zara',
+                        x: 600, y: 150,
+                        hunger: 30, energy: 90, happiness: 80,
+                        color: '#ffe66d',
+                        ai: new AdvancedPetAI('Zara', { social: 0.9, energy: 0.4, food: 0.5 })
+                    }
+                ];
+
+                this.food = [];
+                this.messages = [];
+                this.showAI = false;
+                this.frameCount = 0;
+
+                this.startGameLoop();
+            }
+
+            spawnFood() {
+                const food = {
+                    x: Math.random() * (this.canvas.width - 100) + 50,
+                    y: Math.random() * (this.canvas.height - 100) + 50,
+                    size: 8 + Math.random() * 4,
+                    color: '#ffeb3b',
+                    nutrition: 20 + Math.random() * 30
+                };
+                this.food.push(food);
+                this.addMessage(`🍎 Food spawned at (${Math.round(food.x)}, ${Math.round(food.y)})`);
+            }
+
+            addNewPet() {
+                const names = ['Pixel', 'Byte', 'Code', 'Logic', 'Array', 'Loop'];
+                const colors = ['#9c27b0', '#e91e63', '#ff5722', '#795548', '#607d8b'];
+                
+                const newPet = {
+                    name: names[Math.floor(Math.random() * names.length)],
+                    x: Math.random() * (this.canvas.width - 100) + 50,
+                    y: Math.random() * (this.canvas.height - 100) + 50,
+                    hunger: Math.random() * 60 + 20,
+                    energy: Math.random() * 60 + 40,
+                    happiness: Math.random() * 60 + 30,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    ai: new AdvancedPetAI('NewPet', {
+                        social: Math.random(),
+                        energy: Math.random(),
+                        food: Math.random()
+                    })
+                };
+
+                this.pets.push(newPet);
+                this.addMessage(`✨ ${newPet.name} joined the ecosystem!`);
+            }
+
+            addMessage(message) {
+                this.messages.unshift({
+                    text: message,
+                    timestamp: Date.now()
+                });
+                
+                // Keep only last 10 messages
+                if (this.messages.length > 10) {
+                    this.messages = this.messages.slice(0, 10);
+                }
+                
+                this.updateMessageDisplay();
+            }
+
+            updateMessageDisplay() {
+                const logElement = document.getElementById('messageLog');
+                logElement.innerHTML = this.messages.map(msg => 
+                    `<div class="message">${msg.text}</div>`
+                ).join('');
+            }
+
+            update() {
+                this.frameCount++;
+
+                const environment = {
+                    pets: this.pets,
+                    food: this.food,
+                    width: this.canvas.width,
+                    height: this.canvas.height
+                };
+
+                // Update pets with AI
+                this.pets.forEach(pet => {
+                    const action = pet.ai.think(pet, environment);
+                    const movement = pet.ai.executeAction(pet, action, environment);
+
+                    // Apply movement
+                    pet.x = Math.max(25, Math.min(this.canvas.width - 25, pet.x + movement.dx));
+                    pet.y = Math.max(25, Math.min(this.canvas.height - 25, pet.y + movement.dy));
+
+                    // Update pet stats over time
+                    pet.hunger = Math.min(100, pet.hunger + 0.05);
+                    
+                    if (action === 'rest') {
+                        pet.energy = Math.min(100, pet.energy + 0.3);
+                    } else {
+                        pet.energy = Math.max(0, pet.energy - 0.02);
+                    }
+
+                    // Check food consumption
+                    this.food.forEach((food, index) => {
+                        const distance = Math.sqrt((pet.x - food.x) ** 2 + (pet.y - food.y) ** 2);
+                        if (distance < 20) {
+                            pet.hunger = Math.max(0, pet.hunger - food.nutrition);
+                            pet.happiness = Math.min(100, pet.happiness + 5);
+                            this.food.splice(index, 1);
+                            this.addMessage(`${pet.name} ate food! 😋`);
+                        }
+                    });
+
+                    // Social interactions
+                    this.pets.forEach(otherPet => {
+                        if (otherPet !== pet) {
+                            const distance = Math.sqrt((pet.x - otherPet.x) ** 2 + (pet.y - otherPet.y) ** 2);
+                            if (distance < 30) {
+                                pet.happiness = Math.min(100, pet.happiness + 0.1);
+                                otherPet.happiness = Math.min(100, otherPet.happiness + 0.1);
+                            }
+                        }
+                    });
+                });
+
+                // Auto-spawn food occasionally
+                if (Math.random() < 0.008 && this.food.length < 5) {
+                    this.spawnFood();
+                }
+
+                // Update UI
+                if (this.frameCount % 30 === 0) { // Update UI every 30 frames
+                    this.updateUI();
+                }
+            }
+
+            render() {
+                // Clear canvas with gradient background
+                const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+                gradient.addColorStop(0, '#667eea');
+                gradient.addColorStop(1, '#764ba2');
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Draw food
+                this.food.forEach(food => {
+                    this.ctx.fillStyle = food.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(food.x, food.y, food.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Food glow effect
+                    this.ctx.shadowColor = food.color;
+                    this.ctx.shadowBlur = 10;
+                    this.ctx.fill();
+                    this.ctx.shadowBlur = 0;
+                });
+
+                // Draw pets
+                this.pets.forEach(pet => {
+                    // Pet body
+                    this.ctx.fillStyle = pet.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(pet.x, pet.y, 20, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    // Pet glow
+                    this.ctx.shadowColor = pet.color;
+                    this.ctx.shadowBlur = 15;
+                    this.ctx.fill();
+                    this.ctx.shadowBlur = 0;
+
+                    // Pet border
+                    this.ctx.strokeStyle = '#ffffff';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.stroke();
+
+                    // Eyes
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.beginPath();
+                    this.ctx.arc(pet.x - 8, pet.y - 5, 3, 0, Math.PI * 2);
+                    this.ctx.arc(pet.x + 8, pet.y - 5, 3, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    this.ctx.fillStyle = '#000000';
+                    this.ctx.beginPath();
+                    this.ctx.arc(pet.x - 8, pet.y - 5, 1.5, 0, Math.PI * 2);
+                    this.ctx.arc(pet.x + 8, pet.y - 5, 1.5, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    // Mouth based on happiness
+                    this.ctx.strokeStyle = '#000000';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    if (pet.happiness > 60) {
+                        // Happy mouth
+                        this.ctx.arc(pet.x, pet.y + 2, 6, 0, Math.PI);
+                    } else if (pet.happiness < 30) {
+                        // Sad mouth
+                        this.ctx.arc(pet.x, pet.y + 8, 6, Math.PI, 0);
+                    } else {
+                        // Neutral mouth
+                        this.ctx.moveTo(pet.x - 4, pet.y + 5);
+                        this.ctx.lineTo(pet.x + 4, pet.y + 5);
+                    }
+                    this.ctx.stroke();
+
+                    // Pet name
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.font = '12px Arial';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText(pet.name, pet.x, pet.y + 35);
+
+                    // Status indicators
+                    if (pet.hunger > 70) {
+                        this.ctx.fillText('🍽️', pet.x + 25, pet.y - 20);
+                    }
+                    if (pet.energy < 30) {
+                        this.ctx.fillText('😴', pet.x - 25, pet.y - 20);
+                    }
+                    if (pet.happiness > 80) {
+                        this.ctx.fillText('😊', pet.x, pet.y - 30);
+                    }
+                });
+            }
+
+            updateUI() {
+                // Update counters
+                document.getElementById('petCount').textContent = this.pets.length;
+                document.getElementById('foodCount').textContent = this.food.length;
+
+                // Update pet stats
+                const petStatsElement = document.getElementById('petStats');
+                petStatsElement.innerHTML = this.pets.map(pet => `
+                    <div class="pet-stats">
+                        <strong>${pet.name}</strong>
+                        <div class="stat-bar">
+                            <span class="stat-label">Hunger</span>
+                            <div class="stat-progress">
+                                <div class="stat-fill hunger-fill" style="width: ${pet.hunger}%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <span class="stat-label">Energy</span>
+                            <div class="stat-progress">
+                                <div class="stat-fill energy-fill" style="width: ${pet.energy}%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-bar">
+                            <span class="stat-label">Happy</span>
+                            <div class="stat-progress">
+                                <div class="stat-fill happiness-fill" style="width: ${pet.happiness}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            startGameLoop() {
+                const gameLoop = () => {
+                    this.update();
+                    this.render();
+                    requestAnimationFrame(gameLoop);
+                };
+                gameLoop();
+            }
+        }
+
+        // Global game instance
+        let ecosystem;
+
+        // Control functions
+        function spawnFood() {
+            ecosystem.spawnFood();
+        }
+
+        function addNewPet() {
+            ecosystem.addNewPet();
+        }
+
+        function toggleAIDisplay() {
+            const aiSection = document.getElementById('aiCodeSection');
+            if (aiSection.style.display === 'none') {
+                aiSection.style.display = 'block';
+                ecosystem.showAI = true;
+            } else {
+                aiSection.style.display = 'none';
+                ecosystem.showAI = false;
+            }
+        }
+
+        function resetEcosystem() {
+            ecosystem = new WebPetEcosystem();
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('load', () => {
+            ecosystem = new WebPetEcosystem();
+            console.log('🌐 Web Pet Ecosystem initialized!');
+            console.log('🤖 Neural networks active, AI pets thinking autonomously');
+        });
+    </script>
+</body>
+</html>

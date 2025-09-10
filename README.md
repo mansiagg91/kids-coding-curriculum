@@ -104,6 +104,15 @@ Experience cutting-edge educational technology that makes coding irresistibly en
 
 [**🔧 Discover Physical Computing →**](./PHYSICAL-COMPUTING.md)
 
+### 🎮 **Playable AI Learning Game**
+Experience the complete learning journey through our interactive game that teaches programming and AI concepts:
+- **Play First**: Start by caring for virtual pets and learning through fun
+- **Observe NPCs**: Watch AI characters with different personalities interact
+- **Program Behaviors**: Use visual blocks to control NPC actions and responses
+- **Train AI**: Implement machine learning to create intelligent, adaptive pets
+
+[**🎯 Play Virtual Pet Academy Game →**](./INTERACTIVE-AI-GAME.md) | [**💾 Download Game →**](./virtual_pet_academy_game.py)
+
 ---
 
 ## 🗺️ **Complete Learning Journey**
